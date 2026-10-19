@@ -39,7 +39,7 @@ button:active{background:#4a22a0}
 .box .b{font-size:calc(15*var(--u));color:#9fe8ff;margin-bottom:calc(16*var(--u))}
 .box button{display:block;width:100%;margin-top:calc(10*var(--u));padding:calc(12*var(--u));font-size:calc(18*var(--u))}
 #menu{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 10%,var(--bg1) 0%,var(--bg2) 75%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(10*var(--u));padding:0 calc(28*var(--u));box-sizing:border-box}
-#menu.hide,#howto.hide,#shop.hide,#stats.hide,#settings.hide{display:none}
+#menu.hide,#howto.hide,#shop.hide,#stats.hide,#settings.hide,#cal.hide{display:none}
 .logo{font-size:calc(56*var(--u));line-height:.95;font-weight:900;letter-spacing:calc(3*var(--u));text-align:center;color:#ffe028;text-shadow:calc(3*var(--u)) calc(3*var(--u)) 0 #ff3cc8,calc(6*var(--u)) calc(6*var(--u)) 0 #2a1366,0 0 calc(24*var(--u)) rgba(255,224,40,.5);margin-bottom:calc(2*var(--u))}
 .logo span{color:#00e6ff;text-shadow:calc(3*var(--u)) calc(3*var(--u)) 0 #ff3cc8,calc(6*var(--u)) calc(6*var(--u)) 0 #2a1366,0 0 calc(24*var(--u)) rgba(0,230,255,.5)}
 #msub{white-space:pre-line;font-size:calc(13*var(--u));color:#9fe8ff;margin-bottom:calc(8*var(--u));text-align:center}
@@ -50,8 +50,8 @@ button:active{background:#4a22a0}
 #mResume{border-color:#ff8a28;background:#4a2410;text-align:center}
 .mrow{display:flex;gap:calc(10*var(--u));width:100%;margin-top:calc(4*var(--u))}
 .mrow button{flex:1;padding:calc(10*var(--u));font-size:calc(14*var(--u))}
-#howto,#shop,#stats,#settings{position:absolute;inset:0;background:rgba(8,3,24,.96);display:flex;align-items:center;justify-content:center;padding:calc(20*var(--u));box-sizing:border-box}
-#howto .t,#shop .t,#stats .t,#settings .t{border:calc(3*var(--u)) solid var(--acc);background:var(--panel);border-radius:calc(14*var(--u));padding:calc(16*var(--u));font-size:calc(14*var(--u));line-height:1.4;width:100%;max-height:100%;overflow:auto;box-sizing:border-box}
+#howto,#shop,#stats,#settings,#cal{position:absolute;inset:0;background:rgba(8,3,24,.96);display:flex;align-items:center;justify-content:center;padding:calc(20*var(--u));box-sizing:border-box}
+#howto .t,#shop .t,#stats .t,#settings .t,#cal .t{border:calc(3*var(--u)) solid var(--acc);background:var(--panel);border-radius:calc(14*var(--u));padding:calc(16*var(--u));font-size:calc(14*var(--u));line-height:1.4;width:100%;max-height:100%;overflow:auto;box-sizing:border-box}
 #gear{padding:calc(5*var(--u)) calc(7*var(--u));display:flex;align-items:center}
 #gear svg{width:calc(16*var(--u));height:calc(16*var(--u))}
 #tutSkip{position:absolute;top:calc(42*var(--u));right:calc(8*var(--u));font-size:calc(10*var(--u));padding:calc(3*var(--u)) calc(8*var(--u));border-color:#6c5ca0}
@@ -76,7 +76,7 @@ button:active{background:#4a22a0}
 .set label span{color:var(--hot)}
 .set i{display:block;font-style:normal;font-size:calc(11*var(--u));color:#9fe8ff;margin-top:calc(3*var(--u))}
 input[type=range]{width:100%;accent-color:var(--acc);height:calc(28*var(--u))}
-#howto h2,#shop h2,#stats h2,#settings h2{margin:0 0 calc(8*var(--u));color:var(--hot);font-size:calc(22*var(--u))}
+#howto h2,#shop h2,#stats h2,#settings h2,#cal h2{margin:0 0 calc(8*var(--u));color:var(--hot);font-size:calc(22*var(--u))}
 #howto p{margin:calc(6*var(--u)) 0}
 .coins{color:#ffe028;font-weight:bold;margin-bottom:calc(8*var(--u))}
 .it{display:flex;align-items:center;justify-content:space-between;gap:calc(8*var(--u));padding:calc(7*var(--u)) 0;border-bottom:calc(1*var(--u)) solid #2a1366}
@@ -91,6 +91,13 @@ input[type=range]{width:100%;accent-color:var(--acc);height:calc(28*var(--u))}
 .ac i{display:block;font-style:normal;font-size:calc(11*var(--u));color:#9fe8ff}
 .sec{margin:calc(10*var(--u)) 0 calc(4*var(--u));color:#ff3cc8;font-weight:bold}
 #chest{border-color:#ffe028;background:#3a2e0a;text-align:center}
+#calGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:calc(6*var(--u));margin:calc(10*var(--u)) 0}
+.cd{border:calc(2*var(--u)) solid #2a1366;border-radius:calc(8*var(--u));padding:calc(6*var(--u)) calc(2*var(--u));text-align:center;font-size:calc(11*var(--u));line-height:1.25;background:#150a3a}
+.cd b{display:block;color:#9fe8ff;font-size:calc(11*var(--u))}
+.cd span{display:block;color:#ffe028;font-weight:bold;font-size:calc(13*var(--u));margin-top:calc(2*var(--u))}
+.cd.done{opacity:.45;border-color:#46ff8a}
+.cd.now{border-color:#ffe028;background:#3a2e0a;box-shadow:0 0 calc(10*var(--u)) #ffe028}
+.cd.big{grid-column:span 2}
 </style>
 </head>
 <body>
@@ -162,6 +169,13 @@ input[type=range]{width:100%;accent-color:var(--acc);height:calc(28*var(--u))}
     <div id="stats" class="hide"><div class="t">
       <h2>ДОСТИЖЕНИЯ</h2><div id="statList"></div>
       <button id="statClose" style="margin-top:12px;width:100%">НАЗАД</button>
+    </div></div>
+    <div id="cal" class="hide"><div class="t">
+      <h2>НАГРАДА ЗА ВХОД</h2>
+      <p id="calSub" style="margin:0;color:#9fe8ff"></p>
+      <div id="calGrid"></div>
+      <button id="calGet" style="width:100%;border-color:#ffe028">ЗАБРАТЬ</button>
+      <button id="calClose" style="margin-top:8px;width:100%">ЗАКРЫТЬ</button>
     </div></div>
     <div id="howto" class="hide"><div class="t">
       <h2>КАК ИГРАТЬ</h2>
@@ -291,7 +305,7 @@ if(!settings.lang){settings.lang=LANG;saveSettings()}
 const CYR=/[А-Яа-яЁё]/;
 const EN_PAIRS=[
 ['ЗВУК ВКЛ','SOUND ON'],['ЗВУК ВЫКЛ','SOUND OFF'],['ИГРА ОКОНЧЕНА','GAME OVER'],['ЕЩЁ РАЗ','AGAIN'],['ВТОРОЙ ШАНС!','SECOND CHANCE!'],['ВТОРОЙ ШАНС','SECOND CHANCE'],
-['ПОДЕЛИТЬСЯ','SHARE'],['СКОПИРОВАНО','COPIED'],['МЕНЮ','MENU'],['ПРОДОЛЖИТЬ','RESUME'],['ПОДАРОК ДНЯ','DAILY GIFT'],
+['ПОДЕЛИТЬСЯ','SHARE'],['СКОПИРОВАНО','COPIED'],['МЕНЮ','MENU'],['ПРОДОЛЖИТЬ','RESUME'],['ПОДАРОК ДНЯ','DAILY GIFT'],['НАГРАДА ЗА ВХОД','LOGIN REWARD'],['Заходи каждый день: награда растёт. Пропустишь день, начнём сначала.','Come back every day: rewards grow. Miss a day and it starts over.'],['Награда за сегодня уже получена. Завтра заходи за следующей!','Today\'s reward is claimed. Come back tomorrow for the next one!'],['ЗАБРАТЬ','CLAIM'],['Получено: ','Received: '],['перемешать','shuffle'],['бомба','bomb'],['отмена','undo'],
 ['ОБЫЧНАЯ','CLASSIC'],['ЕЖЕДНЕВНАЯ','DAILY'],['БЛИЦ','BLITZ'],['УРОВНИ','LEVELS'],['ВЫЗОВ: ПОБЕЙ','CHALLENGE: BEAT'],['ВЫЗОВ','CHALLENGE'],
 ['МАГАЗИН','SHOP'],['ДОСТИЖЕНИЕ: ','ACHIEVEMENT: '],['ДОСТИЖЕНИЯ','ACHIEVEMENTS'],['ТЕМА','THEME'],['КАК ИГРАТЬ','HOW TO PLAY'],
 ['СБРОСИТЬ НАСТРОЙКИ','RESET SETTINGS'],['НАСТРОЙКИ','SETTINGS'],['НАЗАД','BACK'],
@@ -557,14 +571,36 @@ function ach(id){
   addCoins(25);
   setTimeout(()=>{big('ДОСТИЖЕНИЕ: '+t,'#ffe028');confetti()},1300);
 }
-function chestReady(){return getJ('nb_chest','')!==dateKey()}
-function chestAmount(){return 20+10*Math.min(streak,7)}
+// календарь наград за вход: 7 дней по кругу, пропуск дня сбрасывает на день 1
+const CAL=[{c:30},{c:40,p:{bomb:1}},{c:50},{c:60,p:{shuf:1}},{c:70},{c:90,p:{undo:1,bomb:1}},{c:150,p:{bomb:2,shuf:2,undo:2}}];
+const PN={bomb:'бомба',shuf:'перемешать',undo:'отмена'};
+function calSt(){return getJ('nb_cal',{d:'',n:0})}
+function calNext(){ // номер дня 1..7, который можно забрать сегодня (или уже забран)
+  const s=calSt(),t=dateKey();
+  if(s.d===t)return((s.n-1)%7)+1;
+  return s.d===dateKey(new Date(Date.now()-864e5))?(s.n%7)+1:1;
+}
+function chestReady(){return calSt().d!==dateKey()&&getJ('nb_chest','')!==dateKey()}
+function calText(r){return '+'+r.c+' ●'+(r.p?' + '+Object.keys(r.p).map(k=>PN[k]+(r.p[k]>1?' ×'+r.p[k]:'')).join(', '):'')}
+function chestAmount(){return CAL[calNext()-1].c}
 let chestMsg='';
+function renderCal(){
+  const ready=chestReady(),day=calNext();
+  document.getElementById('calSub').textContent=tr(ready?'Заходи каждый день: награда растёт. Пропустишь день, начнём сначала.':'Награда за сегодня уже получена. Завтра заходи за следующей!');
+  document.getElementById('calGrid').innerHTML=tr(CAL.map((r,i)=>{
+    const cls=(ready?i+1<day:i+1<=day)?'done':((ready&&i+1===day)?'now':'');
+    return '<div class="cd '+cls+(i===6?' big':'')+'"><b>День '+(i+1)+'</b><span>'+calText(r).replace(' + ','<br>+ ')+'</span>'+(cls==='done'?'✔':'')+'</div>';
+  }).join(''));
+  const g=document.getElementById('calGet');g.style.display=ready?'block':'none';g.textContent=tr('ЗАБРАТЬ: '+calText(CAL[day-1]).split(' + ')[0]);
+}
+function openCal(){renderCal();document.getElementById('cal').classList.remove('hide')}
 function claimChest(){
-  if(!chestReady())return;setJ('nb_chest',dateKey());
-  const c=chestAmount();addCoins(c);chestMsg='Получено: +'+c+' ●';
-  if(streak%3===0){const k=['bomb','shuf','undo'][Math.floor(Math.random()*3)];stash[k]++;setJ('nb_stash',stash);chestMsg+=' и '+{bomb:'бомба',shuf:'перемешать',undo:'отмена'}[k]}
-  arp([660,880,1100,1320],70);menuInfo();
+  if(!chestReady())return;
+  const day=calNext(),s=calSt(),r=CAL[day-1];
+  setJ('nb_cal',{d:dateKey(),n:s.d===dateKey(new Date(Date.now()-864e5))?s.n+1:1});setJ('nb_chest',dateKey());
+  addCoins(r.c);chestMsg='Получено: '+calText(r);
+  if(r.p){Object.keys(r.p).forEach(k=>{stash[k]+=r.p[k]});setJ('nb_stash',stash)}
+  arp([660,880,1100,1320],70);if(day===7)confetti();menuInfo();renderCal();
 }
 function secondChance(){
   if(second||!over||won||mode==='challenge'||!spend(50))return;
@@ -940,7 +976,7 @@ function menuInfo(){
   document.getElementById('msub').textContent=tr('● '+coins+'  ·  серия '+streak+' дн.  ·  задание '+Math.min(mLines,M_TARGET)+'/'+M_TARGET+(chestMsg?'\n'+chestMsg:''));
   const ch=document.getElementById('chest');
   ch.style.display=chestReady()?'block':'none';
-  document.getElementById('chestI').textContent=tr('забери монеты: +'+chestAmount()+' ●'+(streak%3===0?' и усилитель':''));
+  document.getElementById('chestI').textContent=tr(LANG==='en'?'day '+calNext()+' of 7: '+calText(CAL[calNext()-1]):'день '+calNext()+' из 7: '+calText(CAL[calNext()-1]));
 }
 function openMenu(resumable){
   menuOpen=true;drag=null;bombMode=false;menuInfo();
@@ -1084,7 +1120,9 @@ function openSupport(){
 }
 document.getElementById('supBtn').onclick=openSupport;
 document.getElementById('supBtn2').onclick=openSupport;
-document.getElementById('chest').onclick=claimChest;
+document.getElementById('chest').onclick=openCal;
+document.getElementById('calGet').onclick=claimChest;
+document.getElementById('calClose').onclick=()=>document.getElementById('cal').classList.add('hide');
 document.getElementById('second').onclick=secondChance;
 // карточка результата: рисуется прямо в игре (твоя тема, итоговое поле, счёт, ранг), её можно переслать картинкой
 function makeCard(){
@@ -1270,7 +1308,7 @@ window.NB={step:autoStep,reset,get score(){return score},get over(){return over}
 parseHash();loadMeta();track('open');startLang();
 if(/tgWebApp/.test(location.hash+location.search)||window.TelegramWebviewProxy)loadTG(); // только внутри Telegram
 reset();requestAnimationFrame(loop);
-if(mode==='challenge'){closeMenu();maybeTip()}else openMenu(false);
+if(mode==='challenge'){closeMenu();maybeTip()}else{openMenu(false);if(getJ('nb_tut',0)&&chestReady())openCal()}
 })();
 </script>
 </body>

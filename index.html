@@ -493,8 +493,9 @@ let ac=null;
 function beep(f,d,type,v,slide){
   if(muted)return;try{
     if(!ac){
-      // на iPhone звук «игровой», а не «рингтонный»: не глушится выключателем «без звука» (Safari 16.4+)
-      try{if(navigator.audioSession)navigator.audioSession.type='playback'}catch(e){}
+      // на iPhone тип «ambient» (Safari 16.4+): звук игры не вызывает системную плашку плеера сверху экрана
+      // (с типом «playback» iOS показывала её и закрывала кнопки). Выключатель «без звука» при этом глушит игру, это нормально.
+      try{if(navigator.audioSession)navigator.audioSession.type='ambient'}catch(e){}
       ac=new (window.AudioContext||window.webkitAudioContext)();
     }
     // iOS усыпляет звук, когда игру свернули: будим перед каждым звуком

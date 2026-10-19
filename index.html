@@ -120,6 +120,7 @@ input[type=range]{width:100%;accent-color:var(--acc);height:calc(28*var(--u))}
       <button class="mb c4" data-m="levels"><b>УРОВНИ</b><i id="d_levels"></i></button>
       <div class="mrow"><button id="shopBtn">МАГАЗИН</button><button id="statBtn">ДОСТИЖЕНИЯ</button></div>
       <div class="mrow"><button id="theme">ТЕМА</button><button id="how">КАК ИГРАТЬ</button><button id="setBtn">НАСТРОЙКИ</button></div>
+      <div class="mrow"><button id="supBtn">ПОДДЕРЖКА И ПОЖЕЛАНИЯ</button></div>
     </div>
     <div id="settings" class="hide"><div class="t">
       <h2>НАСТРОЙКИ</h2>
@@ -129,6 +130,7 @@ input[type=range]{width:100%;accent-color:var(--acc);height:calc(28*var(--u))}
       <div class="set"><label>Вибрация <span id="vVib"></span></label><button id="sVib" style="width:100%">ВКЛ / ВЫКЛ</button></div>
       <div class="set"><label>Экономия <span id="vEco"></span></label><button id="sEco" style="width:100%">ВКЛ / ВЫКЛ</button><i>для слабых телефонов: без свечения и тряски, меньше частиц, игра идёт плавнее</i></div>
       <div class="set"><label>Язык / Language <span id="vLang"></span></label><button id="sLang" style="width:100%">РУССКИЙ ⇄ ENGLISH</button></div>
+      <button id="supBtn2" style="width:100%;margin-top:6px;border-color:#46ff8a">ПОДДЕРЖКА И ПОЖЕЛАНИЯ</button>
       <button id="sReset" style="width:100%;margin-top:6px">СБРОСИТЬ НАСТРОЙКИ</button>
       <button id="setClose" style="margin-top:8px;width:100%">НАЗАД</button>
     </div></div>
@@ -327,7 +329,7 @@ const EN_PAIRS=[
 ['Тема','Theme'],['монет','coins'],['есть:','owned:'],['или ранг','or rank'],['ВКЛЮЧЕНА','ACTIVE'],['ВКЛЮЧИТЬ','ENABLE'],['КУПИТЬ','BUY'],
 ['Партий сыграно','Games played'],['Линий сожжено','Lines burned'],['Лучшее комбо','Best combo'],['Лучшая серия дней','Best streak (days)'],['Монет заработано','Coins earned'],
 ['Боссов побеждено','Bosses defeated'],['Пройдено уровней','Levels completed'],['Рекорд (обычная)','Record (classic)'],['Рекорд дня','Daily record'],['Рекорд (блиц)','Record (blitz)'],['СТАТИСТИКА','STATS'],
-['очков. Побьёшь?','points. Can you beat it?'],['Побьёшь?','Can you beat it?'],['ПРОПУСТИТЬ','SKIP'],
+['очков. Побьёшь?','points. Can you beat it?'],['Побьёшь?','Can you beat it?'],['ПОДДЕРЖКА И ПОЖЕЛАНИЯ','SUPPORT AND SUGGESTIONS'],['ПРОПУСТИТЬ','SKIP'],
 ['Перетащи фигуру на поле','Drag a piece onto the board'],['Тяни пальцем: фигура приподнимется','Drag with your finger: the piece lifts up'],
 ['Заполни строку или столбец,','Fill a row or a column,'],['и они сгорят!','and it will burn!'],
 ['Отлично! Копи заряд: полоска внизу.','Great! Build charge: the bar at the bottom.'],['Он даёт бомбу, перемешивание и отмену.','It gives a bomb, a shuffle and an undo.'],['НАЧАТЬ СНАЧАЛА?','START OVER?'],['НАЧАТЬ СНАЧАЛА','START OVER'],['Текущая партия будет потеряна.','The current game will be lost.'],['МОЙ РЕЗУЛЬТАТ','MY RESULT'],
@@ -1067,6 +1069,19 @@ document.getElementById('sVib').onclick=()=>{settings.vib=!settings.vib;saveSett
 document.getElementById('sReset').onclick=()=>{settings=Object.assign({},SET_DEF,{lang:LANG});saveSettings();ECO=false;fit();renderSettings()};
 document.getElementById('sEco').onclick=()=>{settings.eco=!settings.eco;ECO=settings.eco;saveSettings();fit();renderSettings()};
 document.getElementById('sLang').onclick=()=>setLangLive(LANG==='ru'?'en':'ru');
+// поддержка и пожелания: открывает чат с владельцем игры, сообщение уже заполнено подсказкой
+const GAME_VERSION='v11.2';
+const SUPPORT_USER='kajsshej';
+function openSupport(){
+  const where=TG?'Telegram':'браузер';
+  const body=LANG==='en'
+    ?'Neon Blocks '+GAME_VERSION+' ('+(TG?'Telegram':'browser')+', mode: '+mode+'). Bug / suggestion. Device and what you did:\n'
+    :'Neon Blocks '+GAME_VERSION+' ('+where+', режим: '+MODE_NAMES[mode].toLowerCase()+'). Баг / пожелание. Устройство и что нажимал:\n';
+  const url='https://t.me/'+SUPPORT_USER+'?text='+encodeURIComponent(body);
+  try{if(TG&&TG.openTelegramLink)TG.openTelegramLink(url);else window.open(url,'_blank')}catch(e){}
+}
+document.getElementById('supBtn').onclick=openSupport;
+document.getElementById('supBtn2').onclick=openSupport;
 document.getElementById('chest').onclick=claimChest;
 document.getElementById('second').onclick=secondChance;
 // карточка результата: рисуется прямо в игре (твоя тема, итоговое поле, счёт, ранг), её можно переслать картинкой

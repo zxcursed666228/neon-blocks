@@ -415,7 +415,7 @@ const LV=[
  ['score',900,24,'........|........|...SS...|........|S.IIII.S|S.IIII.S|S.IIII.S|S.IIII.S']
 ];
 const GT={lines:n=>'сожги '+n+' линий',score:n=>'набери '+fmt(n)+' очков',stars:n=>'собери '+n+' звёзд',ice:n=>'разбей лёд: '+n,combo:n=>'сделай комбо x'+n};
-function mkLevel(type,n,moves,map,boss){if(type==='score')n*=SK;return{type,n,moves,map:map.split('|'),boss:!!boss,txt:GT[type]}}
+function mkLevel(type,n,moves,map,boss){if(type==='score')n=Math.round(n*0.85/5)*5*SK;moves=Math.ceil(moves*1.5)+2;return{type,n,moves,map:map.split('|'),boss:!!boss,txt:GT[type]}}
 function genLevel(k){
   const j=k-20,boss=(k%5===4);
   let rows=LV[(k*7+3)%LV.length][3].split('|');
@@ -877,7 +877,9 @@ function draw(dt){
   if(!ECO){ctx.fillStyle='rgba(0,0,0,.10)';for(let y=0;y<H;y+=4)ctx.fillRect(0,y,W,1)}
 }
 let last=performance.now();
+let manualFrames=false; // технический режим для записи роликов: кадры рисуются вручную (NB.frame)
 function loop(now){
+  if(manualFrames){requestAnimationFrame(loop);return}
   if(ECO&&now-last<30){requestAnimationFrame(loop);return} // в режиме экономии рисуем не чаще ~30 раз в секунду
   const dt=Math.min(.05,(now-last)/1000);last=now;draw(dt);requestAnimationFrame(loop);
 }
@@ -1258,6 +1260,7 @@ window.NB={step:autoStep,reset,get score(){return score},get over(){return over}
   tick(t){blitzT-=t},get time(){return blitzT},get board(){return board},get stars(){return stars},get tray(){return tray},
   placeAt(i,r,c){if(tray[i]&&canPlace(tray[i].m,r,c)){place(i,r,c);return true}return false},
   power(k){if(k==='shuf'&&powCount('shuf')>0){tray=newTray();usePow('shuf');snap=null}else if(k==='undo'&&powCount('undo')>0&&snap){restore(snap);snap=null;usePow('undo')}else if(k==='bomb'&&powCount('bomb')>0&&hasPieces()){const f=[];for(let y=0;y<N;y++)for(let x=0;x<N;x++)if(board[y][x])f.push([x,y]);const c=f[Math.floor(Math.random()*f.length)];useBomb(c[0],c[1])}},
+  manual(b){manualFrames=!!b},frame(dt){draw(dt)},get canvas(){return cv},
   get tut(){return tut},get eco(){return ECO},initTG(){initTG()},get tg(){return TG},get mode_(){return mode},pushCloud,syncFromCloud,collectSave,setLang(l){setLangLive(l)},killObserver(){if(langObs){langObs.disconnect();langObs=null}},get lang(){return LANG},get missing(){return [...trMissing]},tr,
   store(k,v){setJ(k,v);if(k==='nb_coins')coins=v;if(k==='nb_stash')stash=Object.assign({bomb:0,shuf:0,undo:0},v)},
   get coins(){return coins},get stash(){return stash},claim:claimChest,second:secondChance,

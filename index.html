@@ -11,12 +11,13 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#0b0620">
-<meta name="description" content="Neon Blocks: block puzzle with 20 levels, bosses, daily challenge and 10 themes. Play free in your browser.">
+<meta name="description" content="Neon Blocks: блок-пазл с 20 уровнями, боссами, ежедневным вызовом и 10 темами. Играй бесплатно.">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Neon Blocks">
-<meta property="og:description" content="Block puzzle with 20 levels, bosses, daily challenge and 10 themes. Play free.">
-<!-- после публикации заменить на полный адрес, например https://ник.github.io/neon-blocks/preview.png -->
-<meta property="og:image" content="preview.png">
+<meta property="og:description" content="Блок-пазл: 20 уровней, боссы, ежедневный вызов и 10 тем. Играй бесплатно.">
+<meta property="og:url" content="https://zxcursed666228.github.io/neon-blocks/">
+<meta property="og:image" content="https://zxcursed666228.github.io/neon-blocks/preview_ru.png">
+<link rel="canonical" href="https://zxcursed666228.github.io/neon-blocks/">
 <meta name="twitter:card" content="summary_large_image">
 <title>Neon Blocks</title>
 <style>
@@ -135,6 +136,7 @@ input[type=range]{width:100%;accent-color:var(--acc);height:calc(28*var(--u))}
       <h2>МОЙ РЕЗУЛЬТАТ</h2>
       <img id="cardImg" alt="">
       <p style="font-size:calc(11*var(--u));color:#9fe8ff">Нажми на картинку и удерживай, чтобы сохранить</p>
+      <button id="cardSend" style="display:none;width:100%;margin-bottom:8px;border-color:#46ff8a">ОТПРАВИТЬ ДРУГУ</button>
       <button id="cardCopy" style="width:100%">СКОПИРОВАТЬ ТЕКСТ</button>
       <button id="cardClose" style="margin-top:8px;width:100%">ЗАКРЫТЬ</button>
     </div></div>
@@ -194,6 +196,7 @@ function applyTheme(i){
   s.setProperty('--bg1',t.bg1);s.setProperty('--bg2',t.bg2);s.setProperty('--acc',t.acc);
   s.setProperty('--hot',t.hot);s.setProperty('--panel',t.panel);s.setProperty('--btn',t.btn);
   const b=document.getElementById('theme');if(b)b.textContent=tr(t.n);
+  try{applyTGColors()}catch(e){}
 }
 const cv=document.getElementById('c'),ctx=cv.getContext('2d'),stage=document.getElementById('stage');
 let sx=1;
@@ -240,12 +243,18 @@ function rnd(){rs=(rs+0x6D2B79F5)|0;let t=Math.imul(rs^rs>>>15,1|rs);t=t+Math.im
 function dateKey(d){d=d||new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
 function seedFrom(s){let h=2166136261;for(const ch of s){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
 // сохранение: localStorage, а если он отключён (приватная вкладка и т.п.), то хотя бы в памяти на время сессии
+let TG=null; // Telegram.WebApp, если игра открыта как Mini App
 const mem={};
 function getJ(k,d){
   try{const v=localStorage.getItem(k);if(v!==null)return JSON.parse(v)}catch(e){}
   return k in mem?mem[k]:d;
 }
-function setJ(k,v){mem[k]=v;try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+function setJ(k,v){mem[k]=v;try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}onSaved(k)}
+function onSaved(k){ // отмечаем время последнего изменения и (в Telegram) отправляем сохранение в облако
+  if(k==='nb_ts')return;
+  const t=Date.now();mem.nb_ts=t;try{localStorage.setItem('nb_ts',JSON.stringify(t))}catch(e){}
+  scheduleCloud();
+}
 // Счётчик посещений без cookies и личных данных (GoatCounter, бесплатно). Впиши сюда код своего сайта,
 // например 'neonblocks' для neonblocks.goatcounter.com. Пока пусто, ничего никуда не отправляется.
 const GOATCOUNTER='neonblocks';
@@ -322,7 +331,7 @@ const EN_PAIRS=[
 ['Перетащи фигуру на поле','Drag a piece onto the board'],['Тяни пальцем: фигура приподнимется','Drag with your finger: the piece lifts up'],
 ['Заполни строку или столбец,','Fill a row or a column,'],['и они сгорят!','and it will burn!'],
 ['Отлично! Копи заряд: полоска внизу.','Great! Build charge: the bar at the bottom.'],['Он даёт бомбу, перемешивание и отмену.','It gives a bomb, a shuffle and an undo.'],['НАЧАТЬ СНАЧАЛА?','START OVER?'],['НАЧАТЬ СНАЧАЛА','START OVER'],['Текущая партия будет потеряна.','The current game will be lost.'],['МОЙ РЕЗУЛЬТАТ','MY RESULT'],
-['Нажми на картинку и удерживай, чтобы сохранить','Press and hold the image to save it'],['СКОПИРОВАТЬ ТЕКСТ','COPY TEXT'],['ЗАКРЫТЬ','CLOSE'],['ЛУЧШЕЕ КОМБО','BEST COMBO'],['РЕЖИМ','MODE']
+['Нажми на картинку и удерживай, чтобы сохранить','Press and hold the image to save it'],['СКОПИРОВАТЬ ТЕКСТ','COPY TEXT'],['ОТПРАВИТЬ ДРУГУ','SEND TO A FRIEND'],['ЗАКРЫТЬ','CLOSE'],['ЛУЧШЕЕ КОМБО','BEST COMBO'],['РЕЖИМ','MODE']
 ];
 const EN_SORTED=EN_PAIRS.slice().sort((a,b)=>b[0].length-a[0].length);
 const trCache=new Map(),trMissing=new Set();
@@ -469,7 +478,7 @@ function reset(){
     const bonus=+getJ('nb_bonus',0)||0;
     if(bonus>0){pw.bomb+=bonus;pw.shuf+=bonus;pw.undo+=bonus;setJ('nb_bonus',0)}
   }
-  second=false;gameCoins=0;gameMaxCombo=0;
+  second=false;gameCoins=0;gameMaxCombo=0;tgConfirm(false);
   best=loadBest();startBest=best;rankIdx=0;streak=touchStreak();mLines=getJ('nb_m_'+dateKey(),0);
   stat(s=>{if(streak>(s.bestStreak||0))s.bestStreak=streak});
   tray=newTray();
@@ -501,7 +510,13 @@ document.addEventListener('visibilitychange',()=>{ // вернулись в иг
   try{if(document.visibilityState==='visible'&&ac&&ac.state!=='running')ac.resume().catch(()=>{})}catch(e){}
 });
 function arp(list,gap){list.forEach((f,i)=>setTimeout(()=>beep(f,.12,'square',.07),i*gap))}
-function vib(ms){try{if(!muted&&settings.vib&&navigator.vibrate)navigator.vibrate(ms)}catch(e){}}
+function vib(ms){
+  if(muted||!settings.vib)return;
+  try{
+    if(TG&&TG.HapticFeedback){TG.HapticFeedback.impactOccurred(ms>=60?'heavy':ms>=35?'medium':'light');return} // вибрация Telegram работает и на iPhone
+    if(navigator.vibrate)navigator.vibrate(ms);
+  }catch(e){}
+}
 
 function spawn(x,y,c){
   const cx=BX+x*CS+CS/2,cy=BY+y*CS+CS/2;
@@ -590,7 +605,7 @@ function clearCells(set,force){
 }
 
 function place(i,r,c){
-  snap=snapshot();started=true;
+  snap=snapshot();started=true;tgConfirm(true);
   const p=tray[i],m=p.m;let cells=0,k=0;
   for(let a=0;a<m.length;a++)for(let b=0;b<m[0].length;b++)if(m[a][b]){
     board[r+a][c+b]=p.c+1;stars[r+a][c+b]=(p.star===k);cells++;k++}
@@ -661,6 +676,7 @@ function useBomb(x,y){
   if(mode==='levels'&&levelDone())endGame(true);
 }
 function endGame(win){
+  tgConfirm(false);
   over=true;won=!!win;drag=null;bombMode=false;saveBest();
   track('end/'+mode+(win?'/win':'')+(mode==='levels'?'/level-'+(level+1):''));
   if(win){
@@ -1084,13 +1100,100 @@ function makeCard(){
   x.fillText(tr('КОМБО')+' x'+gameMaxCombo+'   ·   '+tr('Побьёшь?'),cw/2,1318);
   return c;
 }
-let cardText='';
+// ---- Telegram Mini App ----
+// Когда создашь Mini App у @BotFather, впиши сюда его ссылку, например 'https://t.me/neonblocks_bot/play'.
+// Пока пусто: ссылки-вызовы ведут на сайт.
+const TG_APP_LINK='https://t.me/neonblocks_game_bot/play';
+function loadTG(){ // грузим скрипт Telegram только когда игра открыта внутри Telegram
+  if(window.Telegram&&window.Telegram.WebApp){initTG();return}
+  const s=document.createElement('script');
+  s.src='https://telegram.org/js/telegram-web-app.js';s.onload=initTG;s.onerror=()=>{};
+  document.head.appendChild(s);
+}
+function applyTGColors(){
+  if(!TG)return;const c=T().bg2;
+  try{TG.setHeaderColor&&TG.setHeaderColor(c)}catch(e){}
+  try{TG.setBackgroundColor&&TG.setBackgroundColor(c)}catch(e){}
+  try{TG.setBottomBarColor&&TG.setBottomBarColor(c)}catch(e){}
+}
+let tgConf=false;
+function tgConfirm(on){ // спрашиваем «закрыть?» только пока идёт партия
+  if(!TG||tgConf===on)return;tgConf=on;
+  try{on?TG.enableClosingConfirmation():TG.disableClosingConfirmation()}catch(e){}
+}
+function initTG(){
+  const w=window.Telegram&&window.Telegram.WebApp;if(!w||TG)return;
+  TG=w;
+  try{w.ready()}catch(e){}
+  try{w.expand()}catch(e){}
+  try{w.disableVerticalSwipes&&w.disableVerticalSwipes()}catch(e){} // не закрывать игру смахиванием вниз
+  applyTGColors();
+  // ссылка-вызов: t.me/бот/игра?startapp=c_<seed>_<счёт>
+  try{
+    const sp=(w.initDataUnsafe&&w.initDataUnsafe.start_param)||'';
+    const m=/^c_(\d+)_(\d+)$/.exec(sp);
+    if(m&&mode!=='challenge'){mode='challenge';seed=+m[1];chTarget=+m[2];closeMenu();reset();maybeTip()}
+  }catch(e){}
+  syncFromCloud();
+}
+// облачное сохранение: весь прогресс (монеты, уровни, темы, достижения, настройки) лежит в облаке Telegram
+let cloudTimer=null;
+function collectSave(){
+  const o={},today=dateKey(),keys=new Set(Object.keys(mem));
+  try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.indexOf('nb_')===0)keys.add(k)}}catch(e){}
+  keys.forEach(k=>{
+    if(k.indexOf('nb_m_')===0&&k!=='nb_m_'+today)return;
+    if(k.indexOf('nb_best_daily_')===0&&k!=='nb_best_daily_'+today)return;
+    const v=getJ(k,undefined);if(v!==undefined)o[k]=v;
+  });
+  return o;
+}
+function scheduleCloud(){if(!TG||!TG.CloudStorage)return;clearTimeout(cloudTimer);cloudTimer=setTimeout(pushCloud,2500)}
+function pushCloud(){
+  if(!TG||!TG.CloudStorage)return;
+  try{
+    const o=collectSave();let s=JSON.stringify(o);
+    if(s.length>3900){delete o.nb_stats;s=JSON.stringify(o)} // у значения в облаке лимит 4096 символов
+    TG.CloudStorage.setItem('nb_save',s,()=>{});
+  }catch(e){}
+}
+function syncFromCloud(){
+  if(!TG||!TG.CloudStorage)return;
+  try{TG.CloudStorage.getItem('nb_save',(err,val)=>{
+    if(err||!val){pushCloud();return}
+    let cloud;try{cloud=JSON.parse(val)}catch(e){pushCloud();return}
+    const cts=+cloud.nb_ts||0,lts=+getJ('nb_ts',0)||0;
+    if(cts>lts){ // в облаке свежее: берём его
+      Object.keys(cloud).forEach(k=>{mem[k]=cloud[k];try{localStorage.setItem(k,JSON.stringify(cloud[k]))}catch(e){}});
+      refreshAfterCloud();
+    }else if(lts>cts)pushCloud();
+  })}catch(e){}
+}
+function refreshAfterCloud(){
+  loadMeta();
+  settings=Object.assign({},SET_DEF,getJ('nb_settings',{}));
+  ECO=!!settings.eco;fit();
+  const ti=+getJ('nb_theme',0)||0;applyTheme(ti<THEMES.length&&themeOwned(ti)?ti:0);
+  if(settings.lang&&settings.lang!==LANG)setLangLive(settings.lang);
+  streak=touchStreak();mLines=getJ('nb_m_'+dateKey(),0);
+  menuInfo();
+}
+
+let cardText='',cardLink='',cardMsg='';
 function closeCard(){document.getElementById('card').classList.add('hide')}
 async function shareCard(btn){
   const base=location.href.split('#')[0];
-  const link=(mode==='levels')?base:base+'#c='+seed+'&s='+score;
-  cardText=tr('Neon Blocks: '+fmt(score)+' очков. Побьёшь? ')+link;
+  const webLink=(mode==='levels')?base:base+'#c='+seed+'&s='+score;
+  const link=TG_APP_LINK?((mode==='levels')?TG_APP_LINK:TG_APP_LINK+'?startapp=c_'+seed+'_'+score):webLink;
+  cardMsg=tr('Neon Blocks: '+fmt(score)+' очков. Побьёшь? ');cardLink=link;
+  cardText=cardMsg+link;
   const c=makeCard();
+  if(TG){ // в Telegram показываем карточку и кнопку «отправить другу» (откроется выбор чата)
+    document.getElementById('cardImg').src=c.toDataURL('image/png');
+    document.getElementById('cardSend').style.display='block';
+    document.getElementById('card').classList.remove('hide');
+    return;
+  }
   let file=null;
   try{
     const blob=await new Promise(r=>c.toBlob(r,'image/png'));
@@ -1105,6 +1208,10 @@ async function shareCard(btn){
 }
 document.getElementById('share').onclick=function(){shareCard(this)};
 document.getElementById('cardClose').onclick=closeCard;
+document.getElementById('cardSend').onclick=()=>{
+  const url='https://t.me/share/url?url='+encodeURIComponent(cardLink)+'&text='+encodeURIComponent(cardMsg);
+  try{if(TG&&TG.openTelegramLink)TG.openTelegramLink(url);else window.open(url,'_blank')}catch(e){}
+};
 document.getElementById('cardCopy').onclick=function(){
   if(navigator.clipboard)navigator.clipboard.writeText(cardText).then(()=>{this.textContent=tr('СКОПИРОВАНО')}).catch(()=>{});
 };
@@ -1135,13 +1242,14 @@ window.NB={step:autoStep,reset,get score(){return score},get over(){return over}
   tick(t){blitzT-=t},get time(){return blitzT},get board(){return board},get stars(){return stars},get tray(){return tray},
   placeAt(i,r,c){if(tray[i]&&canPlace(tray[i].m,r,c)){place(i,r,c);return true}return false},
   power(k){if(k==='shuf'&&powCount('shuf')>0){tray=newTray();usePow('shuf');snap=null}else if(k==='undo'&&powCount('undo')>0&&snap){restore(snap);snap=null;usePow('undo')}else if(k==='bomb'&&powCount('bomb')>0&&hasPieces()){const f=[];for(let y=0;y<N;y++)for(let x=0;x<N;x++)if(board[y][x])f.push([x,y]);const c=f[Math.floor(Math.random()*f.length)];useBomb(c[0],c[1])}},
-  get tut(){return tut},get eco(){return ECO},setLang(l){setLangLive(l)},killObserver(){if(langObs){langObs.disconnect();langObs=null}},get lang(){return LANG},get missing(){return [...trMissing]},tr,
+  get tut(){return tut},get eco(){return ECO},initTG(){initTG()},get tg(){return TG},get mode_(){return mode},pushCloud,syncFromCloud,collectSave,setLang(l){setLangLive(l)},killObserver(){if(langObs){langObs.disconnect();langObs=null}},get lang(){return LANG},get missing(){return [...trMissing]},tr,
   store(k,v){setJ(k,v);if(k==='nb_coins')coins=v;if(k==='nb_stash')stash=Object.assign({bomb:0,shuf:0,undo:0},v)},
   get coins(){return coins},get stash(){return stash},claim:claimChest,second:secondChance,
   get chestReady(){return chestReady()},spend,addCoins,get bombMode(){return bombMode},get goal(){return goal},get prog(){return levelProg}};
 
 {const ti=+getJ('nb_theme',0)||0;applyTheme(ti<THEMES.length&&themeOwned(ti)?ti:0)}
 parseHash();loadMeta();track('open');startLang();
+if(/tgWebApp/.test(location.hash+location.search)||window.TelegramWebviewProxy)loadTG(); // только внутри Telegram
 reset();requestAnimationFrame(loop);
 if(mode==='challenge'){closeMenu();maybeTip()}else openMenu(false);
 })();
